@@ -1,0 +1,26 @@
+name: oidc-smoke
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Azure login via OIDC (no stored secrets)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Prove we authenticated as the federated UAMI
+        run: |
+          echo "== az account show =="
+          az account show -o table
+          echo "== role check: list resource groups we can read =="
+          az group list -o table
